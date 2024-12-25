@@ -1,0 +1,61 @@
+{
+    "files.insertFinalNewline": true,
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "[javascript]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+        "editor.autoClosingBrackets": "always"
+    },
+    "[scss]": {
+        "editor.defaultFormatter": "stylelint.vscode-stylelint"
+    },
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "[jsonc]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "[vue]": {
+        "editor.defaultFormatter": "Vue.volar"
+    },
+    "eslint.options": {},
+    "prettier.enable": false,
+    "eslint.format.enable": true,
+    "editor.formatOnSave": false,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit",
+        "source.fixAll.stylelint": "explicit",
+        "source.organizeImports": "never"
+    },
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact",
+        "vue",
+        "html",
+        "markdown",
+        "json",
+        "jsonc",
+        "yaml",
+        "toml",
+        "xml",
+        "gql",
+        "graphql",
+        "astro",
+        "css",
+        "less",
+        "scss",
+        "pcss",
+        "postcss"
+    ],
+    "stylelint.packageManager": "pnpm",
+    "scss.validate": false,
+    "stylelint.validate": [
+        "css",
+        "scss",
+        "vue"
+    ]
+}

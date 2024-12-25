@@ -1,0 +1,53 @@
+{
+  "name": "nuxt-app",
+  "type": "module",
+  "private": true,
+  "packageManager": "pnpm@9.14.4+sha512.c8180b3fbe4e4bca02c94234717896b5529740a6cbadf19fa78254270403ea2f27d4e1d46a08a0f56c89b63dc8ebfd3ee53326da720273794e6200fcf0d184ab",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "stylelint": "stylelint --fix \"**/*.{vue,scss}\""
+  },
+  "dependencies": {
+    "@firebase/app-types": "^0.9.3",
+    "@nuxt/eslint": "0.7.2",
+    "@nuxt/icon": "1.10.2",
+    "@nuxtjs/color-mode": "^3.5.2",
+    "@nuxtjs/tailwindcss": "6.12.2",
+    "@pinia/nuxt": "0.8.0",
+    "@tanstack/vue-table": "^8.20.5",
+    "@vee-validate/zod": "^4.15.0",
+    "@vueuse/core": "^12.0.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "firebase": "^11.0.2",
+    "firebase-admin": "^13.0.1",
+    "firebase-functions": "^6.1.2",
+    "lucide-vue-next": "^0.462.0",
+    "nuxt": "^3.14.1592",
+    "nuxt-vuefire": "1.0.4",
+    "pinia": "^2.2.7",
+    "radix-vue": "^1.9.10",
+    "shadcn-nuxt": "0.11.3",
+    "tailwind-merge": "^2.5.5",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.7.2",
+    "vee-validate": "^4.15.0",
+    "vue": "latest",
+    "vue-router": "latest",
+    "vuedraggable": "^4.1.0",
+    "vuefire": ">=3.2.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^3.12.0",
+    "@antfu/eslint-config-vue": "^0.43.1",
+    "@iconify-json/tabler": "^1.2.12",
+    "eslint": "^9.16.0",
+    "sass": "^1.81.0"
+  }
+}
