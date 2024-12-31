@@ -1,27 +1,18 @@
 <script lang="ts" setup>
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
-
 definePageMeta({
   layout: 'blank',
   unauthenticatedOnly: true,
 })
 
-const auth = useFirebaseAuth()
+const authStore = useAuthStore()
 
 async function login() {
-  try {
-    if (!auth)
-      throw new Error('Firebase Auth is not initialized')
-
-    auth.languageCode = 'vi'
-    const googleAuthProvider = new GoogleAuthProvider()
-    await signInWithPopup(auth, googleAuthProvider)
-
-    navigateTo('/')
-  }
-  catch (error: any) {
-    notifyError(error)
-  }
+  const router = useRouter()
+  await authStore.login(
+    () => {
+      router.push('/admin')
+    },
+  )
 }
 </script>
 

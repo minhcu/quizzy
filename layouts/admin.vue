@@ -8,7 +8,7 @@ const { pending, error } = orgStore.getOrgs()
 watchError(error)
 
 const activeRoute = computed(() =>
-  Object.values(ADMIN_MENU).find(item => item.to.name === route.name),
+  Object.values(ADMIN_MENU).find(item => typeof route.name === 'string' && route.name.includes(item.to.name)),
 )
 </script>
 

@@ -19,6 +19,12 @@ export default defineNuxtConfig({
     },
   },
 
+  nitro: {
+    firebase: {
+      gen: 2,
+    },
+  },
+
   shadcn: {
     /**
      * Prefix for all the imported component
