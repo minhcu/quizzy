@@ -4,7 +4,7 @@ import { ADMIN_MENU } from '~/constants/menu'
 const route = useRoute()
 
 const orgStore = useOrgStore()
-const { pending, error } = orgStore.getOrgs()
+const { status, error } = useLazyAsyncData(orgStore.fetchOrgs)
 watchError(error)
 
 const activeRoute = computed(() =>
@@ -14,7 +14,7 @@ const activeRoute = computed(() =>
 
 <template>
   <SidebarProvider class="relative">
-    <div v-if="pending" class="absolute top-0 left-0 right-0 bottom-0 bg-white bg-opacity-90 flex justify-center items-center z-[99999] rounded-lg">
+    <div v-if="status === 'pending'" class="absolute top-0 left-0 right-0 bottom-0 bg-white bg-opacity-90 flex justify-center items-center z-[99999] rounded-lg">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="24"

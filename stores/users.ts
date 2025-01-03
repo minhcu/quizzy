@@ -1,59 +1,40 @@
-import { arrayUnion, collection, deleteDoc, doc, query, where, writeBatch } from 'firebase/firestore'
-import { useCollection, useFirestore } from 'vuefire'
+interface User {
+  id: string
+  email: string
+}
 
 export const useUsersStore = defineStore('users', () => {
-  const db = useFirestore()
-  const collectionRef = collection(db, 'users')
-  const queryRef = ref(query(collectionRef))
-  // TODO: WHY AND HOW DOES THIS WORK?
-  function refresh(orgId: string) {
-    queryRef.value = query(collectionRef, where('orgs_ref', 'array-contains', orgId))
+  const orgStore = useOrgStore()
+
+  async function getUsers() {
+    const response = await $api<{
+      data: User[]
+    }>(`/admin/organizations/${orgStore.currentOrg?.id}/users`)
+
+    return response.data
   }
 
-  function getUsers(orgId: string) {
-    queryRef.value = query(collectionRef, where('orgs_ref', 'array-contains', orgId))
-    return useCollection(queryRef, {
-      once: true,
+  async function addUsers(emailList: string[]) {
+    await $api(`/admin/organizations/${orgStore.currentOrg?.id}/users`, {
+      method: 'POST',
+      body: {
+        emailList,
+      },
     })
-  }
-
-  async function addUsers(emailList: string[], orgId: string) {
-    const batch = writeBatch(db)
-
-    emailList.forEach((email) => {
-      const userRef = doc(db, 'users', email)
-      batch.set(userRef, {
-        email,
-        orgs_ref: arrayUnion(orgId),
-      }, {
-        merge: true,
-      })
-    })
-
-    return await batch.commit()
   }
 
   async function removeUsers(emailList: string[]) {
-    const batch = writeBatch(db)
-
-    emailList.forEach((email) => {
-      const userRef = doc(db, 'users', email)
-      batch.delete(userRef)
+    await $api(`/admin/organizations/${orgStore.currentOrg?.id}/users`, {
+      method: 'DELETE',
+      body: {
+        emailList,
+      },
     })
-
-    return await batch.commit()
-  }
-
-  async function removeUser(id: string) {
-    const userRef = doc(db, 'users', id)
-    return await deleteDoc(userRef)
   }
 
   return {
-    refresh,
     getUsers,
     addUsers,
-    removeUser,
     removeUsers,
   }
 })

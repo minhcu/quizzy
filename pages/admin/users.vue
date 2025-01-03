@@ -15,12 +15,11 @@ import { Button } from '~/components/ui/button'
 import { Checkbox } from '~/components/ui/checkbox'
 import Textarea from '~/components/ui/textarea/Textarea.vue'
 
-const orgStore = useOrgStore()
 const usersStore = useUsersStore()
 
 // TODO: what if users length is over 1000?
-const { data: users, pending, error: getUsersError } = usersStore.getUsers(orgStore.currentOrg?.id)
-
+const { data, status, error: getUsersError, refresh } = useLazyAsyncData(usersStore.getUsers)
+const users = computed(() => data.value ?? [])
 watchError(getUsersError)
 
 const columns: ColumnDef<any>[] = [
@@ -70,8 +69,7 @@ const columns: ColumnDef<any>[] = [
     cell: ({ row }) => {
       const user = row.original
       return h('div', { class: 'relative' }, h(ActionMenu, {
-        user,
-        onLoading: value => pending.value = value,
+        onDelete: () => deleteUser(user),
       }))
     },
   },
@@ -114,18 +112,11 @@ async function addUsers() {
     return
 
   try {
-    pending.value = true
-    await usersStore.addUsers(emailsList, orgStore.currentOrg?.id)
-    usersStore.refresh(orgStore.currentOrg?.id)
-    console.log(users)
+    status.value = 'pending'
+    await usersStore.addUsers(emailsList)
+    refresh()
   }
-  catch (error) {
-    console.error(error)
-    notifyError('Failed to add users')
-  }
-  finally {
-    pending.value = false
-  }
+  catch {}
 }
 
 async function handleDelete() {
@@ -135,23 +126,27 @@ async function handleDelete() {
   const userIds = Object.keys(rowSelection.value)
     .map(index => users.value[Number(index)].id)
   try {
-    pending.value = true
+    status.value = 'pending'
     await usersStore.removeUsers(userIds)
     table.toggleAllPageRowsSelected(false)
-    usersStore.refresh(orgStore.currentOrg?.id)
+    refresh()
   }
-  catch {
-    notifyError('Failed to delete users')
+  catch {}
+}
+
+async function deleteUser(user) {
+  try {
+    status.value = 'pending'
+    await usersStore.removeUsers([user.id])
+    refresh()
   }
-  finally {
-    pending.value = false
-  }
+  catch {}
 }
 </script>
 
 <template>
   <Card class="relative">
-    <div v-if="pending" class="absolute top-0 left-0 right-0 bottom-0 bg-white bg-opacity-90 flex justify-center items-center z-10 rounded-lg">
+    <div v-if="status === 'pending'" class="absolute top-0 left-0 right-0 bottom-0 bg-white bg-opacity-90 flex justify-center items-center z-10 rounded-lg">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="24"

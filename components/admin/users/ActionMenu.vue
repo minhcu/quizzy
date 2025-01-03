@@ -1,25 +1,7 @@
 <script lang="ts" setup>
-interface User {
-  id: string
-  email: string
-  isActive?: boolean
-}
-
-const props = defineProps<{
-  user: User
-}>()
-
 const emit = defineEmits<{
-  (event: 'loading', value: boolean): void
+  (event: 'delete'): void
 }>()
-
-const usersStore = useUsersStore()
-async function handleDelete() {
-  emit('loading', true)
-  await usersStore.removeUser(props.user.id)
-  usersStore.refresh()
-  emit('loading', false)
-}
 </script>
 
 <template>
@@ -37,7 +19,7 @@ async function handleDelete() {
 
     <DropdownMenuContent>
       <DropdownMenuLabel>Actions</DropdownMenuLabel>
-      <DropdownMenuItem @click="handleDelete">
+      <DropdownMenuItem @click="emit('delete')">
         Delete
       </DropdownMenuItem>
     </DropdownMenuContent>
