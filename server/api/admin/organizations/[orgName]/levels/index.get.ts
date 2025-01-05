@@ -10,13 +10,14 @@ export default defineWrappedResponseHandler(async (event) => {
   }
 
   const { db } = event.context
-  const collectionRef = db.collection('organizations').doc(orgName).collection('users').where('deleted_at', '==', null)
+  const collectionRef = db.collection(`organizations/${orgName}/levels`)
   const data = (await collectionRef.get()).docs.map(doc => ({
     ...doc.data(),
     id: doc.id,
   }))
 
   return {
+    statusCode: 200,
     data,
   }
 })

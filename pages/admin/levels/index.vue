@@ -2,7 +2,8 @@
 import draggable from 'vuedraggable'
 
 const levelsStore = useLevelsStore()
-const { data: levels, pending, error } = levelsStore.getLevels()
+const { data, status, error, refresh } = useLazyAsyncData(levelsStore.getLevels)
+const levels = computed(() => data.value || [])
 watchError(error)
 
 const newLevelForm = ref({
@@ -12,7 +13,7 @@ const newLevelForm = ref({
 
 async function addLevel() {
   try {
-    pending.value = true
+    status.value = 'pending'
     await levelsStore.addLevel({
       ...newLevelForm.value,
       order: levels.value.length ? levels.value[levels.value.length - 1].order + 1 : 0,
@@ -21,28 +22,18 @@ async function addLevel() {
       title: '',
       description: '',
     }
-    levelsStore.refresh()
+    refresh()
   }
-  catch {
-    notifyError('Failed to add level')
-  }
-  finally {
-    pending.value = false
-  }
+  catch {}
 }
 
 async function deleteLevel(levelId: string) {
   try {
-    pending.value = true
+    status.value = 'pending'
     await levelsStore.deleteLevel(levelId)
-    levelsStore.refresh()
+    refresh()
   }
-  catch {
-    notifyError('Failed to delete level')
-  }
-  finally {
-    pending.value = false
-  }
+  catch {}
 }
 interface OrderChange {
   moved: {
@@ -57,7 +48,7 @@ async function handleOrderChange({ moved: data }: OrderChange) {
   const oldLevel = levels.value[oldIndex]
 
   try {
-    pending.value = true
+    status.value = 'pending'
     await Promise.all([
       levelsStore.updateLevel({
         id: newLevel.id,
@@ -68,21 +59,15 @@ async function handleOrderChange({ moved: data }: OrderChange) {
         order: newLevel.order,
       }),
     ])
-    levelsStore.refresh()
+    refresh()
   }
-  // TODO: Handle reordering error
-  catch {
-    notifyError('Failed to update level order')
-  }
-  finally {
-    pending.value = false
-  }
+  catch {}
 }
 </script>
 
 <template>
   <Card class="relative">
-    <div v-if="pending" class="absolute top-0 left-0 right-0 bottom-0 bg-white bg-opacity-90 flex justify-center items-center z-10 rounded-lg">
+    <div v-if="status === 'pending'" class="absolute top-0 left-0 right-0 bottom-0 bg-white bg-opacity-90 flex justify-center items-center z-10 rounded-lg">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="24"

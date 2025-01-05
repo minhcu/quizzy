@@ -2,7 +2,9 @@ import { defineWrappedResponseHandler } from '~/server/utils/handler'
 
 export default defineWrappedResponseHandler(async (event) => {
   const orgName = getRouterParam(event, 'orgName')
-  if (!orgName) {
+  const levelId = getRouterParam(event, 'levelId')
+  const { level } = await readBody(event)
+  if (!orgName || !levelId || !level) {
     throw createError({
       statusCode: 400,
       message: 'Invalid parameters',
@@ -10,13 +12,11 @@ export default defineWrappedResponseHandler(async (event) => {
   }
 
   const { db } = event.context
-  const collectionRef = db.collection('organizations').doc(orgName).collection('users').where('deleted_at', '==', null)
-  const data = (await collectionRef.get()).docs.map(doc => ({
-    ...doc.data(),
-    id: doc.id,
-  }))
+  const levelRef = db.collection('organizations').doc(orgName).collection('levels').doc(levelId)
+  await levelRef.update(level)
 
   return {
-    data,
+    statusCode: 200,
+    message: 'Level updated',
   }
 })

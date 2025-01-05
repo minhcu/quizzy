@@ -2,15 +2,16 @@ import { FieldValue } from 'firebase-admin/firestore'
 import { defineWrappedResponseHandler } from '~/server/utils/handler'
 
 export default defineWrappedResponseHandler(async (event) => {
-  const { db } = event.context
   const orgName = getRouterParam(event, 'orgName')
   const { emailList } = await readBody<{ emailList: string[] }>(event)
-  if (!orgName) {
+  if (!orgName || !emailList || emailList.length === 0) {
     throw createError({
       statusCode: 400,
       message: 'Invalid parameters',
     })
   }
+
+  const { db } = event.context
 
   const userCollectionRef = db.collection('users')
   const orgUserCollectionRef = db.collection(`organizations/${orgName}/users`)

@@ -1,47 +1,59 @@
-import { addDoc, collection, deleteDoc, doc, orderBy, query, updateDoc } from 'firebase/firestore'
-import { useCollection, useFirestore } from 'vuefire'
+import { addDoc, collection, deleteDoc, doc, or, orderBy, query, updateDoc } from 'firebase/firestore'
 
 interface Level {
   id?: string
   title: string
   description?: string
   order: number
+  tickets?: number
 }
 
 export const useLevelsStore = defineStore('levels', () => {
-  const db = useFirestore()
   const orgStore = useOrgStore()
-  const collectionRef = collection(db, `organizations/${orgStore.currentOrg?.id}/levels`)
-  const queryRef = ref(query(collectionRef, orderBy('order')))
 
-  function refresh() {
-    queryRef.value = query(collection(db, `organizations/${orgStore.currentOrg?.id}/levels`), orderBy('order'))
+  async function getLevels() {
+    const response = await $api<{
+      data: Level[]
+    }>(`/admin/organizations/${orgStore.currentOrg?.id}/levels`)
+
+    return response.data
   }
 
-  function getLevels() {
-    return useCollection(queryRef, {
-      once: true,
-    })
-  }
+  async function getLevel(levelId: string) {
+    const response = await $api<{
+      data: Level
+    }>(`/admin/organizations/${orgStore.currentOrg?.id}/levels/${levelId}`)
 
-  function getLevel(levelId: string) {
-    return useDocument(doc(collectionRef, levelId))
+    return response.data
   }
 
   async function addLevel(level: Level) {
-    return await addDoc(collectionRef, level)
+    await $api(`/admin/organizations/${orgStore.currentOrg?.id}/levels`, {
+      method: 'POST',
+      body: {
+        level,
+      },
+    })
   }
 
   async function deleteLevel(levelId: string) {
-    return await deleteDoc(doc(collectionRef, levelId))
+    await $api(`/admin/organizations/${orgStore.currentOrg?.id}/levels/${levelId}`, {
+      method: 'DELETE',
+    })
   }
 
   async function updateLevel(level: Partial<Level>) {
-    return await updateDoc(doc(collectionRef, level.id as string), { ...level })
+    await $api(`/admin/organizations/${orgStore.currentOrg?.id}/levels/${level.id}`, {
+      method: 'PUT',
+      body: {
+        level: {
+          order: level.order,
+        },
+      },
+    })
   }
 
   return {
-    refresh,
     getLevel,
     getLevels,
     addLevel,
