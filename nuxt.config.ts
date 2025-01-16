@@ -2,7 +2,11 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-  ssr: false,
+  routeRules: {
+    '/lac-xi': {
+      ssr: false,
+    },
+  },
   modules: [
     '@pinia/nuxt',
     '@nuxtjs/tailwindcss',
@@ -22,6 +26,11 @@ export default defineNuxtConfig({
   nitro: {
     firebase: {
       gen: 2,
+      httpsOptions: {
+        maxInstances: 3,
+        timeoutSeconds: 30,
+      },
+      nodeVersion: '22',
     },
   },
 

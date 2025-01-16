@@ -13,9 +13,8 @@ export const $api = $fetch.create({
     switch (error.response.status) {
       case 401:
         try {
-          await useAuthStore().logout(
-            () => navigateTo('/login'),
-          )
+          await useAuthStore().logout()
+          navigateTo('/login')
         }
         catch {
           notifyError('An error occurred. Please try again later.')

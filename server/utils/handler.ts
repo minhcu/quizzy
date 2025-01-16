@@ -1,4 +1,4 @@
-import type { EventHandler, EventHandlerRequest, H3Event, H3EventContext } from 'h3'
+import type { EventHandler, EventHandlerRequest } from 'h3'
 import { getAuth } from 'firebase-admin/auth'
 import { getFirestore } from 'firebase-admin/firestore'
 import firebaseApp from './firebase'
@@ -32,8 +32,8 @@ export function defineWrappedResponseHandler<T extends EventHandlerRequest, D>(h
       const token = authorization.slice(7)
 
       const firebase = firebaseApp()
-      const decoded = await getAuth().verifyIdToken(token)
       const db = getFirestore(firebase)
+      const decoded = await getAuth(firebase).verifyIdToken(token)
       event.context.user = decoded
       event.context.firebase = firebase
       event.context.db = db

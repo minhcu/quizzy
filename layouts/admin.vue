@@ -1,6 +1,13 @@
 <script lang="ts" setup>
 import { ADMIN_MENU } from '~/constants/menu'
 
+definePageMeta({
+  middleware: [async function (to) {
+    if (to.path !== '/lac-xi') {
+      return await navigateTo('/lac-xi')
+    }
+  }],
+})
 const route = useRoute()
 
 const orgStore = useOrgStore()

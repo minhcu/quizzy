@@ -1,5 +1,5 @@
 {
-  "functions": { "source": ".output/server" },
+  "functions": { "source": ".output/server", "runtime": "nodejs22" },
   "hosting": [
     {
       "site": "journey-through-sgroup",

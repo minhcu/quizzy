@@ -7,12 +7,8 @@ definePageMeta({
 const authStore = useAuthStore()
 
 async function login() {
-  const router = useRouter()
-  await authStore.login(
-    () => {
-      router.push('/admin')
-    },
-  )
+  await authStore.login()
+  navigateTo('/lac-xi')
 }
 </script>
 

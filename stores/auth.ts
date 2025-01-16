@@ -13,7 +13,7 @@ export const useAuthStore = defineStore('auth', () => {
     return currentUser
   }
 
-  async function login(callback: () => void) {
+  async function login() {
     const auth = getAuth()
     try {
       if (!auth)
@@ -23,20 +23,18 @@ export const useAuthStore = defineStore('auth', () => {
       const googleProvider = new GoogleAuthProvider()
       const { user } = await signInWithPopup(auth, googleProvider)
 
-      accessToken.value = await user.getIdToken()
-
-      callback && callback()
+      accessToken.value = await user.getIdToken(true)
     }
     catch (error: any) {
       notifyError(error.message || error)
     }
   }
 
-  async function logout(callback: () => void) {
+  async function logout() {
     const auth = getAuth()
     try {
       await signOut(auth)
-      callback && callback()
+      accessToken.value = null
     }
     catch (error: any) {
       notifyError(error.message || error)

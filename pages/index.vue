@@ -1,11 +1,23 @@
 <script lang="ts" setup>
-import { getAuth, signOut } from 'firebase/auth'
-
-const auth = getAuth()
+const authStore = useAuthStore()
 async function logout() {
   try {
-    await signOut(auth)
-    console.log(useCurrentUser())
+    await authStore.logout()
+    navigateTo('/login')
+  }
+  catch (error) {
+    console.error(error)
+  }
+}
+
+async function login() {
+  try {
+    if (authStore.accessToken) {
+      navigateTo('/lac-xi')
+      return
+    }
+    await authStore.login()
+    navigateTo('/lac-xi')
   }
   catch (error) {
     console.error(error)
@@ -16,6 +28,7 @@ async function logout() {
 <template>
   <div>
     <h1>Home Page</h1>
+    <Button @click="login" />
     <Button @click="logout">
       Logout
     </Button>

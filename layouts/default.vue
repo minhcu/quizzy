@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <div class="w-full px-2">
+  <div class="w-full">
     <slot />
   </div>
 </template>
