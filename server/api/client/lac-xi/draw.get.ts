@@ -7,35 +7,15 @@ interface Reward {
   label: string
 }
 
-function forceDraw(rewards: Reward[]): Reward {
+function gacha(rewards: Reward[]): Reward | null {
   const random = Math.random()
-  let returnReward: Reward | null = null
-
-  while (!returnReward) {
-    let current = 0
-    for (const reward of rewards) {
-      current += reward.probability
-      if (random < current && reward.quantity > 0) {
-        returnReward = reward
-        break
-      }
-    }
-  }
-
-  return returnReward
-}
-
-function normalDraw(rewards: Reward[]): Reward | null {
-  const random = Math.random()
-
-  let current = 0
+  let cumulativeProbability = 0
   for (const reward of rewards) {
-    current += reward.probability
-    if (random < current) {
+    cumulativeProbability += reward.probability
+    if (random < cumulativeProbability) {
       return reward
     }
   }
-
   return null
 }
 
@@ -43,83 +23,127 @@ export default defineWrappedResponseHandler(async (event) => {
   const { db, user } = event.context
 
   const dbUserRef = db.collection('organizations').doc('sgroup-lac-xi').collection('users').doc(user.email)
-
-  const dbUser = (await dbUserRef.get()).data()
-
-  if (!dbUser) {
-    throw createError({
-      statusCode: 403,
-      message: 'Forbidden',
-    })
-  }
-
-  if (dbUser.reward) {
-    db.runTransaction(async (transaction) => {
-      transaction.set(dbUserRef, {
-        ticket: dbUser.ticket - 1,
-      }, { merge: true })
-    })
-
-    return {
-      statusCode: 200,
-    }
-  }
-
-  if (dbUser.ticket <= 0) {
-    return {
-      statusCode: 200,
-    }
-  }
-
   const dbRewardsRef = db.collection('organizations').doc('sgroup-lac-xi').collection('rewards')
+  const dbUserHistoryRef = db.collection('organizations').doc('sgroup-lac-xi').collection('users').doc(user.email).collection('history')
 
-  const rewards: Reward[] = (await dbRewardsRef.get()).docs.map((doc) => {
-    const data = doc.data() as Reward
+  const response = await db.runTransaction(async (transaction) => {
+    const dbUser = (await transaction.get(dbUserRef)).data()
+    if (!dbUser) {
+      throw createError({
+        statusCode: 403,
+        message: 'User not found',
+      })
+    }
+
+    if (dbUser.ticket <= 0) {
+      return {
+        statusCode: 200,
+      }
+    }
+
+    const history = (await transaction.get(dbUserHistoryRef.orderBy('timestamp', 'desc'))).docs.map((doc) => {
+      return {
+        id: doc.id,
+        ...doc.data(),
+      }
+    })
+
+    const newHistory = {
+      timestamp: new Date(),
+    }
+
+    if (dbUser.reward) {
+      transaction.update(dbUserRef, {
+        ticket: dbUser.ticket - 1,
+      })
+
+      transaction.set(dbUserHistoryRef.doc(), newHistory)
+
+      return {
+        statusCode: 200,
+        data: {
+          user: {
+            ...dbUser,
+            ticket: dbUser.ticket - 1,
+          },
+          history: [newHistory, ...history],
+        },
+      }
+    }
+
+    const rewards: Reward[] = (await dbRewardsRef.where('quantity', '>', 0).get()).docs.map((doc) => {
+      const data = doc.data() as Reward
+      return {
+        ...data,
+        id: doc.id,
+      }
+    })
+
+    if (rewards.length === 0) {
+      return {
+        statusCode: 200,
+      }
+    }
+
+    let selectedReward: Reward | null = null
+    if (dbUser.ticket > 1) {
+      selectedReward = gacha(rewards)
+    }
+    else {
+      let count = 0
+      while (!selectedReward || count < 10) {
+        count++
+        selectedReward = gacha(rewards)
+      }
+      if (!selectedReward) {
+        selectedReward = rewards[rewards.length - 1]
+      }
+    }
+
+    if (selectedReward) {
+      transaction.update(dbRewardsRef.doc(selectedReward.id), {
+        quantity: selectedReward.quantity - 1,
+      })
+
+      transaction.update(dbUserRef, {
+        reward: selectedReward.id,
+        ticket: dbUser.ticket - 1,
+      })
+
+      newHistory.reward = {
+        id: selectedReward.id,
+        label: selectedReward.label,
+      }
+
+      transaction.set(dbUserHistoryRef.doc(), {
+        ...newHistory,
+        reward: {
+          id: selectedReward.id,
+          label: selectedReward.label,
+        },
+      })
+    }
+    else {
+      transaction.update(dbUserRef, {
+        ticket: dbUser.ticket - 1,
+      })
+
+      transaction.set(dbUserHistoryRef.doc(), newHistory)
+    }
+
     return {
-      ...data,
-      id: doc.id,
+      statusCode: 200,
+      data: {
+        selectedReward,
+        user: {
+          ...dbUser,
+          reward: selectedReward ? selectedReward.id : undefined,
+          ticket: dbUser.ticket - 1,
+        },
+        history: [newHistory, ...history],
+      },
     }
   })
 
-  let selectedReward: Reward | null = null
-
-  if (dbUser.ticket >= 2) {
-    selectedReward = normalDraw(rewards)
-  }
-  else {
-    selectedReward = forceDraw(rewards)
-  }
-
-  if (!selectedReward) {
-    // db.runTransaction(async (transaction) => {
-    //   transaction.set(dbUserRef, {
-    //     tickets: dbUser.ticket - 1,
-    //   }, { merge: true })
-    // })
-
-    return {
-      statusCode: 200,
-    }
-  }
-
-  // if (selectedReward) {
-  //   db.runTransaction(async (transaction) => {
-  //     transaction.set(dbUserRef, {
-  //       reward: selectedReward.id,
-  //       tickets: dbUser.ticket - 1,
-  //     }, { merge: true })
-
-  //     transaction.set(db.collection(LAC_XI_ORG_REWARDS_PATH).doc(selectedReward.id), {
-  //       quantity: selectedReward.quantity - 1,
-  //     }, { merge: true })
-  //   })
-  // }
-
-  return {
-    statusCode: 200,
-    data: {
-      id: selectedReward.id,
-      label: selectedReward.label,
-    },
-  }
+  return response
 })

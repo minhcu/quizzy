@@ -5,6 +5,12 @@ export const useAuthStore = defineStore('auth', () => {
 
   const accessToken = useState<string | null>('accessToken', () => null)
 
+  const auth = getAuth()
+
+  auth.onIdTokenChanged(async (user) => {
+    accessToken.value = user ? await user.getIdToken() : null
+  })
+
   async function getUser() {
     if (currentUser.value)
       return currentUser
@@ -14,7 +20,6 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function login() {
-    const auth = getAuth()
     try {
       if (!auth)
         throw new Error('Firebase Auth is not initialized')
@@ -26,12 +31,13 @@ export const useAuthStore = defineStore('auth', () => {
       accessToken.value = await user.getIdToken(true)
     }
     catch (error: any) {
+      if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request' || error.code === 'auth/popup-blocked')
+        return
       notifyError(error.message || error)
     }
   }
 
   async function logout() {
-    const auth = getAuth()
     try {
       await signOut(auth)
       accessToken.value = null

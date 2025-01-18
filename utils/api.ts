@@ -21,7 +21,6 @@ export const $api = $fetch.create({
         }
         break
       default:
-        notifyError('An error occurred. Please try again later.')
         break
     }
   },

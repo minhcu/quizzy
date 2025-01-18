@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 definePageMeta({
-  layout: 'blank',
   unauthenticatedOnly: true,
 })
 
@@ -8,25 +7,25 @@ const authStore = useAuthStore()
 
 async function login() {
   await authStore.login()
-  navigateTo('/lac-xi')
+  return navigateTo('/lac-xi')
 }
 </script>
 
 <template>
   <Card class="w-full max-w-sm">
     <CardHeader>
-      <CardTitle class="text-2xl font-semibold">
-        Login
+      <CardTitle class="text-2xl lg:text-3xl font-semibold">
+        Đăng nhập
       </CardTitle>
 
-      <CardDescription>
-        Please login to continue
+      <CardDescription class="lg:text-lg">
+        Vui lòng đăng nhập để tiếp tục
       </CardDescription>
     </CardHeader>
 
     <CardContent>
-      <Button class="w-full" @click="login">
-        Login with Google
+      <Button class="w-full lg:text-xl" @click="login">
+        Đăng nhập bằng Google
       </Button>
     </CardContent>
   </Card>

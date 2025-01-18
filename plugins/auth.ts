@@ -5,7 +5,7 @@ export default defineNuxtPlugin({
 
     if (currentUser.value) {
       try {
-        authStore.accessToken = await currentUser.value.getIdToken()
+        authStore.accessToken = await currentUser.value.getIdToken(true)
       }
       catch (error: any) {
         notifyError(error.message || error)
