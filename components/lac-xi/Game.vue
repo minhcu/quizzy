@@ -3,10 +3,10 @@ import type { ResponseSuccess } from '~/constants/lac-xi.const'
 import BoxImage from '~/assets/image/box.webp'
 import CardImage from '~/assets/image/card.webp'
 
-withDefaults(defineProps<{
-  drawNumber?: number
+const props = withDefaults(defineProps<{
+  tickets?: number
 }>(), {
-  drawNumber: 1,
+  tickets: 0,
 })
 const emit = defineEmits(['update:draw'])
 useHead({
@@ -34,6 +34,11 @@ const isDrawing = ref(false)
 const pending = ref(false)
 const isOpenEnvelop = ref(false)
 const canCloseOverlay = ref(false)
+
+const drawNumber = computed(() => {
+  return 4 - props.tickets
+})
+
 let drawData: ResponseSuccess | null = null
 async function drawReward() {
   if (isDrawing.value)
@@ -41,9 +46,13 @@ async function drawReward() {
   isDrawing.value = true
   pending.value = true
 
-  // TODO: handle draw number to prevent spam
-  drawData = await lacXiStore.drawReward()
-  reward.value = drawData.data?.selectedReward || null
+  if (props.tickets > 0) {
+    drawData = await lacXiStore.drawReward()
+    reward.value = drawData.data?.selectedReward || null
+  }
+  else {
+    reward.value = null
+  }
 
   setTimeout(() => {
     pending.value = false
@@ -63,6 +72,29 @@ function updateClose(e: boolean) {
   isOpenEnvelop.value = false
   if (drawData?.data)
     emit('update:draw', drawData)
+}
+
+function getRandomGreeting() {
+  const greetings = [
+    'An khang thịnh vượng!',
+    'Phát tài phát lộc!',
+    'Vạn sự như ý!',
+    'Năm mới hạnh phúc!',
+    'Sức khỏe dồi dào!',
+    'Gia đình hòa thuận, bình an!',
+    'Công danh sự nghiệp thăng hoa!',
+    'Chúc năm mới nhiều may mắn!',
+    'Tấn tài tấn lộc, tấn bình an!',
+    'Xuân sang đắc lộc, phú quý đầy nhà!',
+    'Vui Tết đầm ấm, trọn niềm hạnh phúc!',
+    'Mừng năm mới an khang, thành công rực rỡ!',
+    'Tết đến, xuân về, mọi điều viên mãn!',
+    'Hạnh phúc ngập tràn, may mắn khắp nơi!',
+    'Năm mới đại cát, vạn sự hanh thông!',
+  ]
+
+  const randomIndex = Math.round(Math.random() * greetings.length)
+  return greetings[randomIndex]
 }
 </script>
 
@@ -90,10 +122,14 @@ function updateClose(e: boolean) {
         <div class="max-h-[90dvh] absolute top-0 left-1/2 lac-xi-bounce transition-opacity duration-500" :class="{ 'opacity-0': !pending }">
           <SvgStick />
 
-          // TODO: number of draw
-          // TODO: rate is a little to high
           <span class="text-[#BE1E2D] text-4xl leading-normal text-center absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-            Quẻ<br>săm<br>số<br>{{ drawNumber }}
+            Quẻ<br>săm<br>
+            <template v-if="drawNumber > 3">
+              may<br>mắn
+            </template>
+            <template v-else>
+              số<br>{{ drawNumber }}
+            </template>
           </span>
         </div>
 
@@ -109,14 +145,20 @@ function updateClose(e: boolean) {
               </DialogClose>
 
               <SvgPaper />
-              <span class="text-[#BE1E2D] text-4xl leading-normal text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                {{ reward?.label ?? 'Có cái nịt' }}
+              <span class="text-[#BE1E2D] text-4xl leading-normal text-center w-[90%] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                {{ reward?.label ?? getRandomGreeting() }}
               </span>
             </div>
             <SvgEnvelopFront class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[3]" />
             <SvgEnvelopClose class="absolute z-[3] top-0 left-1/2 -translate-x-1/2 envelop-close" />
             <span class="lac-xi-text text-4xl z-[4] leading-normal text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-              Quẻ<br>săm<br>số<br>{{ drawNumber }}
+              Quẻ<br>săm<br>
+              <template v-if="drawNumber > 3">
+                may<br>mắn
+              </template>
+              <template v-else>
+                số<br>{{ drawNumber }}
+              </template>
             </span>
           </div>
         </div>

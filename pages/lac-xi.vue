@@ -11,6 +11,7 @@ onMounted(() => {
   audio.load()
   audio.addEventListener('loadeddata', () => {
     audioLoaded.value = true
+    audio.loop = true
 
     setTimeout(() => {
       pending.value = false
@@ -60,13 +61,13 @@ function handleAudio() {
           @click="handleAudio"
         >
           <Transition name="fade" mode="out-in">
-            <div v-if="!audioLoaded" class="flex justify-center items-center">
+            <div v-if="!audioLoaded" key="loading" class="flex justify-center items-center">
               <span class="relative w-12 h-12 lg:w-24 lg:h-24 flex items-center justify-center cursor-pointer">
                 <Icon name="tabler-loader-2" class="animate-spin lg:w-24 lg:h-24" size="48" />
               </span>
               <span class="ml-2 uppercase">ĐANG TẢI...</span>
             </div>
-            <div v-else class="flex justify-center items-center">
+            <div v-else key="loaded" class="flex justify-center items-center">
               <span class="relative w-12 h-12 lg:w-24 lg:h-24 flex items-center justify-center cursor-pointer">
                 <Icon name="tabler-circle" class="lg:w-24 lg:h-24" size="48" />
                 <span
@@ -124,7 +125,7 @@ function handleAudio() {
       </div>
       <div class="w-full flex flex-1 relative z-50 pb-15">
         <div class="flex-1 relative">
-          <LacXiGame :draw-number="data?.data.user.ticket" @update:draw="handleDraw" />
+          <LacXiGame :tickets="data?.data.user.ticket" @update:draw="handleDraw" />
         </div>
       </div>
       <div class="bg-white/80 flex items-center justify-around h-16 relative w-full text-xl z-40">

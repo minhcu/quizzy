@@ -91,9 +91,11 @@ export default defineWrappedResponseHandler(async (event) => {
     }
     else {
       let count = 0
-      while (!selectedReward || count < 10) {
+      while (count < 10) {
         count++
         selectedReward = gacha(rewards)
+        if (selectedReward)
+          break
       }
       if (!selectedReward) {
         selectedReward = rewards[rewards.length - 1]
@@ -143,6 +145,16 @@ export default defineWrappedResponseHandler(async (event) => {
         history: [newHistory, ...history],
       },
     }
+  })
+
+  const loggerRef = db.collection('organizations').doc('sgroup-lac-xi').collection('logs')
+  await loggerRef.add({
+    type: 'draw',
+    user: user.email,
+    timestamp: (response.data?.history[0] as { timestamp: Date }).timestamp || new Date(),
+    reward: response.data?.selectedReward || null,
+    ticket: response.data?.user.ticket || 0,
+    message: `[${(response.data?.history[0] as { timestamp: Date }).timestamp || new Date()}] ${user.email} drew ${response.data?.selectedReward?.label || 'nothing'}`,
   })
 
   return response
