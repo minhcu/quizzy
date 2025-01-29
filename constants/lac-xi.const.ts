@@ -1,3 +1,10 @@
+export interface Reward {
+  id: string
+  label: string
+  probability: number
+  quantity: number
+}
+
 export interface User {
   email: string
   reward?: string
@@ -9,10 +16,7 @@ export interface History {
     _nanoseconds: number
     _seconds: number
   } | string
-  reward?: {
-    id: string
-    label: string
-  }
+  reward?: Pick<Reward, 'id' | 'label'>
 }
 
 export interface ResponseSuccess {
@@ -24,5 +28,13 @@ export interface ResponseSuccess {
     }
     history: History[]
     user: User
+  }
+}
+
+export interface ResponseRanking {
+  statusCode: number
+  data: {
+    users: User[]
+    rewards: Pick<Reward, 'id' | 'label'>[]
   }
 }

@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-defineEmits(['music:toggle'])
+const emit = defineEmits(['music:toggle', 'auth:logout'])
 
 const authStore = useAuthStore()
 
 async function logout() {
   await authStore.logout()
+  emit('auth:logout')
   return navigateTo('/login')
 }
 </script>

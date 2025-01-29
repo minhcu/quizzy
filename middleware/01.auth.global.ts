@@ -1,5 +1,5 @@
 export default defineNuxtRouteMiddleware(async (to) => {
-  if (to.path === '/')
+  if (to.path === '/' || to.path.startsWith('/admin'))
     return navigateTo('/lac-xi')
 
   const isAuthenticated = useAuthStore().currentUser || await getCurrentUser()

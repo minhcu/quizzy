@@ -16,7 +16,7 @@ export const useOrgStore = defineStore('org', () => {
     orgList.value = response.data
 
     if (!currentOrg.value) {
-      currentOrg.value = orgList.value[0]
+      currentOrg.value = orgList.value[1]
     }
 
     return orgList.value

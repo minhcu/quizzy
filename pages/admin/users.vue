@@ -104,6 +104,7 @@ async function addUsers() {
 
   const gmailRegex = /^[\w.%+-]+@gmail\.com$/
   const emailsList = [...new Set(emails.value
+    .toLowerCase()
     .split('\n')
     .map(email => email.trim())
     .filter(email => gmailRegex.test(email) && users.value.findIndex(user => user.email === email) === -1))]

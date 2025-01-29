@@ -45,7 +45,9 @@ Build the application for production:
 
 ```bash
 # npm
-npm run build
+npm run build -- --preset=firebase
+
+firebase deploy
 
 # pnpm
 pnpm build

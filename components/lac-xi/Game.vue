@@ -93,7 +93,7 @@ function getRandomGreeting() {
     'Năm mới đại cát, vạn sự hanh thông!',
   ]
 
-  const randomIndex = Math.round(Math.random() * greetings.length)
+  const randomIndex = Math.floor(Math.random() * greetings.length)
   return greetings[randomIndex]
 }
 </script>
@@ -114,7 +114,7 @@ function getRandomGreeting() {
     </div>
 
     <Dialog :open="isDrawing" @update:open="updateClose($event)">
-      <DialogContent class="bg-transparent border-none shadow-none select-none data-[state=open]:zoom-in-75" disable-close>
+      <DialogContent class="bg-transparent border-none shadow-none select-none data-[state=open]:zoom-in-75 p-0" disable-close>
         <DialogTitle class="sr-only">
           Reward Popup
         </DialogTitle>

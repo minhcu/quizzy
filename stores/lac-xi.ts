@@ -1,4 +1,4 @@
-import type { ResponseSuccess } from '~/constants/lac-xi.const'
+import type { ResponseRanking, ResponseSuccess } from '~/constants/lac-xi.const'
 
 export const useLacXiStore = defineStore('lac-xi', () => {
   async function drawReward() {
@@ -9,8 +9,13 @@ export const useLacXiStore = defineStore('lac-xi', () => {
     return await $api<Promise<ResponseSuccess>>('client/lac-xi/history')
   }
 
+  async function fetchRanking() {
+    return await $api<Promise<ResponseRanking>>('client/lac-xi/ranking')
+  }
+
   return {
     drawReward,
     fetchHistory,
+    fetchRanking,
   }
 })

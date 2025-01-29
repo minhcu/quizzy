@@ -47,6 +47,10 @@ function handleAudio() {
   }
   audioPlaying.value = !audioPlaying.value
 }
+
+function handleLogout() {
+  audio && audio.pause && audio.pause()
+}
 </script>
 
 <template>
@@ -136,8 +140,9 @@ function handleAudio() {
           <SvgCloudRight />
         </div>
         <LacXiRewardInfo />
+        <LacXiRanking />
         <LacXiHistory :history="data?.data.history ?? null" :pending="status === 'pending'" />
-        <LacXiSettings @music:toggle="handleAudio" />
+        <LacXiSettings @music:toggle="handleAudio" @auth:logout="handleLogout" />
       </div>
     </template>
   </div>

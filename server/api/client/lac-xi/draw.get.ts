@@ -7,12 +7,18 @@ interface Reward {
   label: string
 }
 
+interface History {
+  timestamp: Date
+  reward?: {
+    id: string
+    label: string
+  }
+}
+
 function gacha(rewards: Reward[]): Reward | null {
   const random = Math.random()
-  let cumulativeProbability = 0
   for (const reward of rewards) {
-    cumulativeProbability += reward.probability
-    if (random < cumulativeProbability) {
+    if (random < reward.probability) {
       return reward
     }
   }
@@ -48,7 +54,7 @@ export default defineWrappedResponseHandler(async (event) => {
       }
     })
 
-    const newHistory = {
+    const newHistory: History = {
       timestamp: new Date(),
     }
 
@@ -148,7 +154,7 @@ export default defineWrappedResponseHandler(async (event) => {
   })
 
   const loggerRef = db.collection('organizations').doc('sgroup-lac-xi').collection('logs')
-  await loggerRef.add({
+  loggerRef.add({
     type: 'draw',
     user: user.email,
     timestamp: (response.data?.history[0] as { timestamp: Date }).timestamp || new Date(),

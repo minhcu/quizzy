@@ -30,6 +30,7 @@ export default defineWrappedResponseHandler(async (event) => {
     batch.set(userOrgRef, {
       email,
       deleted_at: null,
+      ticket: 3,
     }, { merge: true })
   })
 

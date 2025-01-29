@@ -28,27 +28,27 @@
         </TableHeader>
 
         <TableBody>
-          <TableRow>
+          <TableRow class="line-through opacity-50">
             <TableCell>1st</TableCell>
-            <TableCell>100.000VND</TableCell>
-            <TableCell>1%</TableCell>
+            <TableCell>50.000VND</TableCell>
+            <TableCell>2%</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>2nd</TableCell>
-            <TableCell>50.000VND</TableCell>
+            <TableCell>20.000VND</TableCell>
             <TableCell>5%</TableCell>
           </TableRow>
 
           <TableRow>
             <TableCell>3rd</TableCell>
-            <TableCell>20.000VND</TableCell>
-            <TableCell>10%</TableCell>
+            <TableCell>10.000VND</TableCell>
+            <TableCell>20%</TableCell>
           </TableRow>
 
           <TableRow>
             <TableCell>4th</TableCell>
-            <TableCell>10.000VND</TableCell>
-            <TableCell>30%</TableCell>
+            <TableCell>5.000VND</TableCell>
+            <TableCell>40%</TableCell>
           </TableRow>
         </TableBody>
       </Table>
